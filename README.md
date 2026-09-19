@@ -1,8 +1,6 @@
 # Balance Clock
 
-A chess-clock-style timer with two modes, Study and Leisure, instead of two
-players. Time in Study adds to a balance; time in Leisure subtracts from it.
-The balance is capped at ±3 hours.
+A clock based on the 50% rule of Drawabox. 
 
 ## Develop
 
