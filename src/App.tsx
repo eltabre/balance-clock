@@ -1,29 +1,52 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 import { fmt } from './fmt'
+import { playThud } from './sound'
 import { CAP_SECONDS } from './types'
 import { useBalanceClock } from './useBalanceClock'
+
+type ButtonId = 'study' | 'leisure' | 'pause' | 'reset'
 
 function App() {
   const { mode, balance, studyToday, leisureToday, atCap, setMode, pause, reset } =
     useBalanceClock()
 
+  const [pressed, setPressed] = useState<ButtonId | null>(null)
+  const pressTimer = useRef<number | undefined>(undefined)
+
+  const press = useCallback((id: ButtonId, action: () => void) => {
+    playThud(id === 'study' || id === 'leisure' ? 'heavy' : 'light')
+    setPressed(id)
+    window.clearTimeout(pressTimer.current)
+    pressTimer.current = window.setTimeout(() => setPressed(null), 140)
+    action()
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey) return
       if (e.key === '1') {
-        setMode('study')
+        press('study', () => setMode('study'))
       } else if (e.key === '2') {
-        setMode('leisure')
+        press('leisure', () => setMode('leisure'))
       } else if (e.key === ' ') {
         e.preventDefault()
-        pause()
+        press('pause', pause)
       }
     }
+    // Stops a focused button from also "clicking" when space is released.
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (e.key === ' ') e.preventDefault()
+    }
     window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [setMode, pause])
+    window.addEventListener('keyup', onKeyUp)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+    }
+  }, [press, setMode, pause])
 
-  const balanceLabel = balance < 0 ? 'Leisure banked' : 'Study owed'
+  const balanceLabel = balance > 0 ? 'Leisure banked' : 'Study owed'
   const balanceValue = fmt(Math.abs(balance))
   const meterFraction = Math.max(-1, Math.min(1, balance / CAP_SECONDS))
 
@@ -40,8 +63,8 @@ function App() {
       <div className="panels">
         <button
           type="button"
-          className={`panel panel-study${mode === 'study' ? ' running' : ''}`}
-          onClick={() => setMode('study')}
+          className={`panel panel-study${mode === 'study' ? ' running' : ''}${pressed === 'study' ? ' pressed' : ''}`}
+          onClick={() => press('study', () => setMode('study'))}
           aria-pressed={mode === 'study'}
         >
           <span className="panel-name">Study</span>
@@ -50,8 +73,8 @@ function App() {
 
         <button
           type="button"
-          className={`panel panel-leisure${mode === 'leisure' ? ' running' : ''}`}
-          onClick={() => setMode('leisure')}
+          className={`panel panel-leisure${mode === 'leisure' ? ' running' : ''}${pressed === 'leisure' ? ' pressed' : ''}`}
+          onClick={() => press('leisure', () => setMode('leisure'))}
           aria-pressed={mode === 'leisure'}
         >
           <span className="panel-name">Leisure</span>
@@ -82,10 +105,18 @@ function App() {
       <div className="status">{status}</div>
 
       <div className="controls">
-        <button type="button" className="control-btn" onClick={pause}>
+        <button
+          type="button"
+          className={`control-btn${pressed === 'pause' ? ' pressed' : ''}`}
+          onClick={() => press('pause', pause)}
+        >
           Pause
         </button>
-        <button type="button" className="control-btn" onClick={reset}>
+        <button
+          type="button"
+          className={`control-btn${pressed === 'reset' ? ' pressed' : ''}`}
+          onClick={() => press('reset', reset)}
+        >
           Reset
         </button>
       </div>

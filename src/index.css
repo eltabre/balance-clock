@@ -5,6 +5,7 @@
   --text-muted: #6b6b70;
   --border: #d8d8dc;
   --border-hover: #a8a8b0;
+  --edge: #c4c4cc;
   --accent: #2f6feb;
   --accent-bg: rgba(47, 111, 235, 0.1);
   --meter-bg: #e2e2e6;
@@ -29,6 +30,7 @@
     --text-muted: #a0a0a8;
     --border: #333338;
     --border-hover: #4c4c54;
+    --edge: #0b0b0e;
     --accent: #5b9dff;
     --accent-bg: rgba(91, 157, 255, 0.15);
     --meter-bg: #2c2c32;
