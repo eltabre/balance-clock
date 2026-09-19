@@ -4,7 +4,7 @@ export interface ClockState {
   mode: Mode
   /** Epoch ms when the current mode started running, or null if paused. */
   since: number | null
-  /** Balance in seconds. Positive = study owed, negative = leisure banked. */
+  /** Balance in seconds. Positive = leisure banked, negative = study owed. */
   balance: number
   /** Seconds spent in study mode today. */
   studyToday: number
