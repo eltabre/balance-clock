@@ -1,6 +1,6 @@
 # Balance Clock
 
-A clock based on the 50% rule of Drawabox. 
+A clock based on the [50% rule of Drawabox](https://drawabox.com/lesson/0/2/50percent) to help me keep track of not only doing lessons and drills, but to also draw for fun.
 
 ## Develop
 
